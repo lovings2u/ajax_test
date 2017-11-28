@@ -1,0 +1,64 @@
+<p>
+  <strong>Title:</strong>
+  <%= @post.title %>
+</p>
+
+<p>
+  <strong>Contents:</strong>
+  <%= @post.contents %>
+</p>
+
+<%= form_tag create_comment_to_post_path, id: "comment" do %>
+  <%= text_field_tag "comment[body]" %>
+  <%= submit_tag "댓글달기" %>
+<% end %>
+<%= link_to 'Edit', edit_post_path(@post), class: "btn btn-warning" %> 
+<%= link_to 'Back', posts_path, class: "btn btn-success" %>
+<% if @like %>
+<%= link_to "Like".html_safe, like_to_post_path, class: "btn btn-info", id: "like_button" %>
+<% else %>
+<%= link_to "DisLike".html_safe, like_to_post_path, class: "btn btn-danger", id: "like_button" %>
+<% end %>
+<span class="badge" id="like_count"><%= @post.likes.count %></span>
+
+<table class="table" id="comment_table">
+  <thead>
+    <tr>
+      <th class="text-center"width="90%">댓글</th>
+      <th width="10%"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @post.comments.reverse.each do |c| %>
+    <tr id="comment-<%= c.id %>">
+      <td><%= c.body %></td>
+      <td><%= link_to "삭제", destory_comment_posts_path(c.id), method: :delete, data: {confirm: "삭제하시겠습니까?"}, class: "btn btn-danger", remote: true %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+<script>
+  $(function() {
+    $('#like_button').on('click', function(e) {
+      e.preventDefault();
+      // console.log("Like Button Clicked");
+      $.ajax({
+        method: "POST",
+        url: "<%= like_to_post_path %>"
+      })
+    })
+    var form = $('#comment');
+    $(document).on('submit','#comment', function(e) {
+      e.preventDefault();
+      var contents = form.serialize();
+      // var contents = $("#comment_body").val();
+      // console.log(contents);
+      $.ajax({
+        url: "<%= create_comment_to_post_path %>",
+        method: "POST",
+        data: contents
+      });
+    });
+    
+  })
+</script>
