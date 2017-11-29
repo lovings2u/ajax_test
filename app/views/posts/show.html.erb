@@ -7,19 +7,22 @@
   <strong>Contents:</strong>
   <%= @post.contents %>
 </p>
+<div style="margin-bottom: 10px;">
+  <%= link_to 'Edit', edit_post_path(@post), class: "btn btn-warning" %> 
+  <%= link_to 'Back', posts_path, class: "btn btn-success" %>
+  <% if @like %>
+    <%= link_to "Like", like_to_post_path, class: "btn btn-info", id: "like_button" %>
+  <% else %>
+    <%= link_to "DisLike", like_to_post_path, class: "btn btn-danger", id: "like_button" %>
+  <% end %>
+  <span class="badge" id="like_count"><%= @post.likes.count %></span>
+</div>
 
 <%= form_tag create_comment_to_post_path, id: "comment" do %>
-  <%= text_field_tag "comment[body]" %>
-  <%= submit_tag "댓글달기" %>
+  <%= text_field_tag "comment[body]", "", class: "form-control" %>
+  <%= submit_tag "댓글달기", class: "btn btn-success", style: "margin-top: 10px;" %>
 <% end %>
-<%= link_to 'Edit', edit_post_path(@post), class: "btn btn-warning" %> 
-<%= link_to 'Back', posts_path, class: "btn btn-success" %>
-<% if @like %>
-<%= link_to "Like".html_safe, like_to_post_path, class: "btn btn-info", id: "like_button" %>
-<% else %>
-<%= link_to "DisLike".html_safe, like_to_post_path, class: "btn btn-danger", id: "like_button" %>
-<% end %>
-<span class="badge" id="like_count"><%= @post.likes.count %></span>
+<h3><span id="word_count">0</span>/<%= Comment.MAX_LENGTH %></h3>
 
 <table class="table" id="comment_table">
   <thead>
@@ -32,7 +35,7 @@
     <% @post.comments.reverse.each do |c| %>
     <tr id="comment-<%= c.id %>">
       <td><%= c.body %></td>
-      <td><%= link_to "삭제", destory_comment_posts_path(c.id), method: :delete, data: {confirm: "삭제하시겠습니까?"}, class: "btn btn-danger", remote: true %></td>
+      <td><%= link_to "삭제", destory_comment_posts_path(c.id), method: :delete, data: {confirm: "삭제하시겠습니까?"}, class: "btn btn-warning", remote: true %></td>
     </tr>
     <% end %>
   </tbody>
@@ -59,6 +62,22 @@
         data: contents
       });
     });
+    var max_text_length = <%= Comment.MAX_LENGTH %>;
+    $('#comment').on('keyup', function(e) {
+      if (e.keyCode == 13) {
+        
+        alert("엔터좀누르지마");
+      }
+      var text_length = $('#comment_body').val().length;
+      $('#word_count').addClass('text-success').removeClass('text-danger');
+      if(text_length >= max_text_length) {
+        alert("최대 길이 넘음");
+        $('#word_count').addClass('text-danger').removeClass('text-success');
+        $('#comment_body').val($('#comment_body').val().substr(0, max_text_length));
+        text_length = $('#comment_body').val().length;
+      }
+      $('#word_count').text(text_length);
+    })
     
   })
 </script>

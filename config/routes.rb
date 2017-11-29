@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     end
     collection do
       delete '/:comment_id/destroy_comment' => 'posts#destroy_comment', as: 'destory_comment'
+      get '/page_scroll' => 'posts#page_scroll', as: 'scroll'
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.

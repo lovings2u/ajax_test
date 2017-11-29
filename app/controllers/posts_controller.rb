@@ -4,7 +4,7 @@ class PostsController < ApplicationController
   # GET /posts
   # GET /posts.json
   def index
-    @posts = Post.all
+    @posts = Post.order("created_at DESC").page(params[:page])
   end
 
   # GET /posts/1
@@ -66,6 +66,9 @@ class PostsController < ApplicationController
   end
   
   def create_comment
+    puts comment_params["body"].length
+    comment_params["body"] = comment_params["body"].gsub(/\r\n/, '')
+    puts comment_params["body"].length
     @c = @post.comments.create(comment_params)
   end
   
@@ -74,7 +77,6 @@ class PostsController < ApplicationController
   end
     
   def like_post
-    
     if Like.where(user_id: current_user.id, post_id: @post.id).first.nil?
       # 좋아요 누르지 않은 상태에 대한 실행문 
       # 좋아요를 만들면 됨
@@ -88,6 +90,10 @@ class PostsController < ApplicationController
     end
     # puts "Like Post Success"
     @result = @result.frozen?
+  end
+  
+  def page_scroll
+    @posts = Post.order("created_at DESC").page(params[:page])
   end
 
   private
